@@ -1,40 +1,54 @@
-
-
 <template>
   <div>
-    <b-button v-b-modal.modal-prevent-closing>Open Modal</b-button>
-
-    <div class="mt-3">
-      Submitted Names:
-      <div v-if="submittedNames.length === 0">--</div>
-      <ul v-else class="mb-0 pl-3">
-        <li v-for="name in submittedNames">{{ name }}</li>
-      </ul>
-    </div>
-
     <b-modal
         id="modal-prevent-closing"
         ref="modal"
-        title="Submit Your Name"
+        title="Regiter a movie"
         @show="resetModal"
         @hidden="resetModal"
         @ok="handleOk"
     >
-      <form ref="form" @submit.stop.prevent="handleSubmit">
+      <form ref="form" @submit.stop.prevent="checkFormValidity" @submit="handleSubmit">
+        <b-alert variant="danger" dismissible :show="errors.length > 0">
+          <b>{{
+              errors.length > 1
+                  ? "Please correct the following errors:"
+                  : "Please correct the following error:"
+            }}</b>
+          <ul>
+            <li v-for="error in errors" :key="error">{{ error }}</li>
+          </ul>
+        </b-alert>
         <b-form-group
             label="Name"
             label-for="name-input"
             invalid-feedback="Name is required"
-            :state="nameState"
         >
           <b-form-input
               id="name-input"
-              v-model="name"
-              :state="nameState"
+              v-model="form.name"
               required
           ></b-form-input>
         </b-form-group>
+        <b-form-group label="Duration" label-for="duration-input">
+          <b-form-timepicker
+              v-model="form.duration"
+              format="12hr"
+              id="duration-input"
+          ></b-form-timepicker>
+        </b-form-group>
+
+        <b-form-group label="Category" label-for="category-input">
+          <b-form-select id="category-input" v-model="form.category" :options="options" required>
+            <template>
+              <option :value="null" disabled>Please select one</option>
+            </template>
+          </b-form-select>
+        </b-form-group>
       </form>
+      {{form.name}}
+      {{form.duration}}
+      {{form.category}}
     </b-modal>
   </div>
 </template>
@@ -42,34 +56,58 @@
 
 <script>
 import {getCategories} from "@/services/Categories";
+
 export default {
   data() {
     return {
-      name: '',
-      nameState: null,
-      submittedNames: []
+      form: {
+        name: '',
+        duration: '',
+        category: null
+      },
+      categories: [],
+      options: [],
+      errors:[]
     }
   },
+  mounted() {
+    this.getCategories();
+  },
   methods: {
-    mounted() {
-      this.getCategories();
-    },
     async getCategories() {
       try {
         const data = await getCategories()
-        console.log(data);
+        this.options = data.map((category) => {
+          return {
+            value: category.id,
+            text: category.name
+          }
+        })
+
+
       } catch (e) {
         console.log(e);
       }
     },
     checkFormValidity() {
-      const valid = this.$refs.form.checkValidity()
-      this.nameState = valid
-      return valid
+      this.errors = []
+      if (!this.form.name) {
+        this.errors.push('Name is required')
+      }
+
+      if(!this.form.duration){
+        this.errors.push('Duration is required')
+      }
+
+      if (!this.form.category) {
+        this.errors.push('Category is required')
+      }
+
     },
     resetModal() {
       this.name = ''
-      this.nameState = null
+      this.duration = ''
+      this.category = null
     },
     handleOk(bvModalEvent) {
       // Prevent modal from closing
@@ -82,8 +120,6 @@ export default {
       if (!this.checkFormValidity()) {
         return
       }
-      // Push the name to submitted names
-      this.submittedNames.push(this.name)
       // Hide the modal manually
       this.$nextTick(() => {
         this.$bvModal.hide('modal-prevent-closing')
