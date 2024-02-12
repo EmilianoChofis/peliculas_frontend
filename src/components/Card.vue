@@ -17,14 +17,14 @@
             style="max-width: 20rem;"
             class="mb-2"
             v-if="!isLoading"
-
+            :border-variant="movie.status === true ? 'success' : 'danger'"
         >
           <b-card-text>
-            <h2>
+            <h3>
               <b>
                 {{ movie.name }}
               </b>
-            </h2>
+            </h3>
 
           </b-card-text>
           <b-card-text>
@@ -34,8 +34,10 @@
             {{ movie.category.description }}
           </b-card-text>
 
-          <b-button variant="primary"><b-icon icon="pen-fill"></b-icon></b-button>
-          <b-button variant="danger"><b-icon icon="trash-fill"></b-icon></b-button>
+          <b-button  variant="primary"><b-icon icon="pen-fill"></b-icon></b-button>
+          <b-button v-on:click="updateStatus(movie.id)" :variant="movie.status === true ? 'danger' : 'success'" >
+            <b-icon :icon="movie.status === true ? 'trash-fill':'arrow-counterclockwise'" ></b-icon>
+          </b-button>
         </b-card>
       </b-col>
     </b-row>
@@ -45,6 +47,7 @@
 
 <script>
 import {GetMovies} from "@/services/Movies";
+import {UpdateStatusMovie} from "@/services/Movies";
 import Loading from "vue-loading-overlay";
 // Import stylesheet
 import 'vue-loading-overlay/dist/vue-loading.css';
@@ -65,6 +68,16 @@ export default {
         this.isLoading = true
         const data = await GetMovies()
         this.movies = data
+        this.isLoading = false
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    async updateStatus(id) {
+      try {
+        this.isLoading = true
+        await UpdateStatusMovie(id)
+        this.getMovies()
         this.isLoading = false
       } catch (e) {
         console.log(e)
