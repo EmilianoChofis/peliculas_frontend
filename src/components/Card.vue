@@ -34,10 +34,14 @@
             {{ movie.category.description }}
           </b-card-text>
 
-          <b-button  variant="primary"><b-icon icon="pen-fill"></b-icon></b-button>
-          <b-button v-on:click="updateStatus(movie.id)" :variant="movie.status === true ? 'danger' : 'success'" >
-            <b-icon :icon="movie.status === true ? 'trash-fill':'arrow-counterclockwise'" ></b-icon>
-          </b-button>
+          <div class="text-center">
+            <b-button class="m-1" v-on:click="putMovie(movie.id)" variant="primary">
+              <b-icon icon="pen-fill"></b-icon>
+            </b-button>
+            <b-button class="m-1" v-on:click="updateStatus(movie.id)" :variant="movie.status === true ? 'danger' : 'success'" >
+              <b-icon :icon="movie.status === true ? 'trash-fill':'arrow-counterclockwise'" ></b-icon>
+            </b-button>
+          </div>
         </b-card>
       </b-col>
     </b-row>
@@ -48,6 +52,7 @@
 <script>
 import {GetMovies} from "@/services/Movies";
 import {UpdateStatusMovie} from "@/services/Movies";
+import {PutMovie} from "@/services/Movies";
 import Loading from "vue-loading-overlay";
 // Import stylesheet
 import 'vue-loading-overlay/dist/vue-loading.css';
@@ -82,6 +87,9 @@ export default {
       } catch (e) {
         console.log(e)
       }
+    },
+    async putMovie(id) {
+      console.log(id)
     }
   },
   components: {

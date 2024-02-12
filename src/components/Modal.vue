@@ -149,7 +149,7 @@ export default {
         this.$bvModal.hide('modal-prevent-closing')
       })
 
-    }
+    },
   }
 }
 </script>
