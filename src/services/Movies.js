@@ -18,3 +18,12 @@ export const PostMovies = async (values) => {
         throw error;
     }
 }
+
+export const GetMovies = async () => {
+    try {
+        const response = await axios.get(API_URL);
+        return response.data.result
+    } catch (error) {
+        throw error;
+    }
+}

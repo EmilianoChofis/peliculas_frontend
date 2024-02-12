@@ -9,9 +9,8 @@ import Modal from "@/components/Modal.vue";
     <h2 class="text-center">
       Peliculas
     </h2>
-   <b-card-group deck>
-     <Card/>
-   </b-card-group>
+    <Card/>
+
     <div class="text-center">
       <b-button v-b-modal.modal-prevent-closing>
         <b-icon icon="plus-circle" aria-hidden="true"></b-icon> New
