@@ -3,7 +3,7 @@
     <b-modal
         id="modal-prevent-closing"
         ref="modal"
-        title="Regiter a movie"
+        title="Register a movie"
         @show="resetModal"
         @hidden="resetModal"
         @ok="handleOk"
@@ -39,16 +39,24 @@
         </b-form-group>
 
         <b-form-group label="Category" label-for="category-input">
-          <b-form-select id="category-input" v-model="form.category" :options="options" required>
+          <b-form-select id="category-input" v-model="form.category.id" :options="options" required>
             <template>
               <option :value="null" disabled>Please select one</option>
             </template>
           </b-form-select>
         </b-form-group>
+        <b-form-group
+            id="director"
+            label="Director"
+            label-for="director"
+        >
+          <b-form-input
+              id="director"
+              v-model="form.director"
+              placeholder="director"
+          ></b-form-input>
+        </b-form-group>
       </form>
-      {{form.name}}
-      {{form.duration}}
-      {{form.category}}
     </b-modal>
   </div>
 </template>
@@ -56,14 +64,17 @@
 
 <script>
 import {getCategories} from "@/services/Categories";
-
+import {PostMovies} from "@/services/Movies";
 export default {
   data() {
     return {
       form: {
         name: '',
         duration: '',
-        category: null
+        category: {
+          id: null,
+        },
+        director:''
       },
       categories: [],
       options: [],
@@ -99,15 +110,23 @@ export default {
         this.errors.push('Duration is required')
       }
 
-      if (!this.form.category) {
+      if (!this.form.category.id) {
         this.errors.push('Category is required')
+      }
+
+      if (!this.form.director) {
+        this.errors.push('Director is required')
       }
 
     },
     resetModal() {
       this.name = ''
       this.duration = ''
-      this.category = null
+      this.category = {
+        id: null
+      }
+      this.director = ''
+      this.errors = []
     },
     handleOk(bvModalEvent) {
       // Prevent modal from closing
@@ -115,7 +134,12 @@ export default {
       // Trigger submit handler
       this.handleSubmit()
     },
-    handleSubmit() {
+    async handleSubmit() {
+      try {
+        const response = await PostMovies(this.form)
+      } catch (e) {
+        console.log(e);
+      }
       // Exit when the form isn't valid
       if (!this.checkFormValidity()) {
         return
@@ -124,6 +148,7 @@ export default {
       this.$nextTick(() => {
         this.$bvModal.hide('modal-prevent-closing')
       })
+
     }
   }
 }
