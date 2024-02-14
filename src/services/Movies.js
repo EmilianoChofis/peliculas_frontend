@@ -1,4 +1,5 @@
 import axios from 'axios';
+import toast from "bootstrap/js/src/toast";
 
 let API_URL = 'http://localhost:8080/api/movie';
 
@@ -13,6 +14,7 @@ export const PostMovies = async (values) => {
 	};
 	try {
 		const response = await axios.post(API_URL, formData);
+
 		return response.request;
 	} catch (error) {
 		console.log(error);

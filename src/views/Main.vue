@@ -23,7 +23,7 @@ import Modal from '@/components/Modal.vue';
 
 			<Card />
 
-			<Modal />
+
 		</b-card>
 	</div>
 </template>

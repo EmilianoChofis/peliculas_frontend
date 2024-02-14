@@ -8,6 +8,12 @@
         @hidden="resetModal"
         @ok="handleOk"
     >
+      <div>
+        <div class="vld-parent" v-show="isLoading">
+          <loading :active.sync="isLoading" :is-full-page="fullPage">
+          </loading>
+        </div>
+      </div>
       <form ref="form" @submit.stop.prevent="checkFormValidity" @submit="handleSubmit">
         <b-alert variant="danger" dismissible :show="errors.length > 0">
           <b>{{
@@ -65,7 +71,11 @@
 <script>
 import {getCategories} from "@/services/Categories";
 import {PostMovies} from "@/services/Movies";
-export default {
+import Loading from "vue-loading-overlay";
+import Vue from "vue";
+
+export default Vue.extend({
+  components: {Loading},
   data() {
     return {
       form: {
@@ -74,11 +84,13 @@ export default {
         category: {
           id: null,
         },
-        director:''
+        director: ''
       },
       categories: [],
       options: [],
-      errors:[]
+      errors: [],
+      isLoading: false,
+      fullPage: true
     }
   },
   mounted() {
@@ -106,7 +118,7 @@ export default {
         this.errors.push('Name is required')
       }
 
-      if(!this.form.duration){
+      if (!this.form.duration) {
         this.errors.push('Duration is required')
       }
 
@@ -129,29 +141,28 @@ export default {
       this.errors = []
     },
     handleOk(bvModalEvent) {
-      // Prevent modal from closing
       bvModalEvent.preventDefault()
-      // Trigger submit handler
       this.handleSubmit()
     },
     async handleSubmit() {
-      try {
-        const response = await PostMovies(this.form)
-      } catch (e) {
-        console.log(e);
-      }
-      // Exit when the form isn't valid
-      if (!this.checkFormValidity()) {
+      this.checkFormValidity()
+      if (this.errors.length > 0) {
         return
       }
-      // Hide the modal manually
-      this.$nextTick(() => {
+      try {
+        this.isLoading = true
+        const response = await PostMovies(this.form)
         this.$bvModal.hide('modal-prevent-closing')
-      })
-
+        this.$emit('getMovie', response);
+        this.$v?.$reset();
+      } catch (e) {
+        console.log(e);
+      }finally {
+        this.isLoading = false
+      }
     },
   }
-}
+})
 </script>
 
 <style scoped>

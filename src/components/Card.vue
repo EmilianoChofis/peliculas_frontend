@@ -1,11 +1,12 @@
 <template>
 	<div class="container-fluid">
+    <div class="vld-parent" v-show="isLoading">
+      <loading :active.sync="isLoading" :is-full-page="fullPage">
+      </loading>
+    </div>
 		<b-row cols="4">
 			<b-col v-for="movie in movies" :key="movie.id">
-				<div class="vld-parent" v-if="isLoading">
-					<loading :active.sync="isLoading" :is-full-page="fullPage">
-					</loading>
-				</div>
+
 				<b-card
 					img-src="https://picsum.photos/600/300/?image=25"
 					img-alt="Image"
@@ -30,6 +31,11 @@
 					</b-card-text>
 					<b-card-text>
 						{{ movie.category.description }}
+            <br>
+            <b>
+              {{ movie.duration}}
+            </b>
+
 					</b-card-text>
 
 					<div class="text-center">
@@ -62,7 +68,8 @@
 		</b-row>
 
 		<UpdateMovie @getMovie="getMovie" :movieSelected="movieSelected" />
-	</div>
+    <Modal @getMovie="getMovie"/>
+  </div>
 </template>
 
 <script>
@@ -73,9 +80,11 @@ import Loading from 'vue-loading-overlay';
 // Import stylesheet
 import 'vue-loading-overlay/dist/vue-loading.css';
 import UpdateMovie from './UpdateMovie.vue';
+import Modal from "@/components/Modal.vue";
 
 export default {
 	components: {
+    Modal,
 		Loading,
 		UpdateMovie,
 	},
@@ -106,10 +115,12 @@ export default {
 				this.isLoading = true;
 				await UpdateStatusMovie(id);
 				this.getMovies();
-				this.isLoading = false;
+
 			} catch (e) {
 				console.log(e);
-			}
+			}finally {
+        this.isLoading = false;
+      }
 		},
 		openModalUpdateMovie(movie) {
 			this.movieSelected = JSON.parse(JSON.stringify(movie));
