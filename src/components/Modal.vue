@@ -132,12 +132,12 @@ export default Vue.extend({
 
     },
     resetModal() {
-      this.name = ''
-      this.duration = ''
-      this.category = {
+      this.form.name = ''
+      this.form.duration = ''
+      this.form.category = {
         id: null
       }
-      this.director = ''
+      this.form.director = ''
       this.errors = []
     },
     handleOk(bvModalEvent) {
