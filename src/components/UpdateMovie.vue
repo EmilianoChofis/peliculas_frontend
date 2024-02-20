@@ -87,6 +87,18 @@
 							placeholder="Director"
 						></b-form-input>
 					</b-form-group>
+          <b-form-group
+            id="update-publicationDate"
+            label="Fecha de publicación"
+            label-for="update-publicationDate"
+          >
+            <b-form-input
+              id="update-publicationDate"
+              v-model="movie.publicationDate"
+              type="date"
+            ></b-form-input>
+          </b-form-group>
+          {{movie.publicationDate}}
 				</form>
 			</b-col>
 		</b-row>
@@ -110,7 +122,7 @@
 
 <script>
 import Vue from 'vue';
-import { UpdateMovie } from '../services/Movies';
+import { UpdateMovie } from '@/services/Movies';
 import { getCategories } from '@/services/Categories';
 import Loading from "vue-loading-overlay";
 
@@ -131,6 +143,7 @@ export default Vue.extend({
 					id: null,
 				},
 				director: '',
+        publicationDate: ''
 			},
 			options: [],
       errors: [],
@@ -157,6 +170,10 @@ export default Vue.extend({
         this.errors.push('Director is required')
       }
 
+     /* if (!this.movie.publicationDate) {
+        this.errors.push('Publication date is required')
+      }*/
+
     },
     resetModal() {
       this.name = ''
@@ -165,6 +182,7 @@ export default Vue.extend({
         id: null
       }
       this.director = ''
+      /*this.publicationDate = ''*/
       this.errors = []
     },
 		closeModalUpdate() {

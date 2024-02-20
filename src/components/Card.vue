@@ -35,6 +35,10 @@
             <b>
               {{ movie.duration}}
             </b>
+            <br>
+            <b>
+              {{ movie.publicationDate}}
+            </b>
 
 					</b-card-text>
 
@@ -67,15 +71,16 @@
 			</b-col>
 		</b-row>
 
+
 		<UpdateMovie @getMovie="getMovie" :movieSelected="movieSelected" />
     <Modal @getMovie="getMovie"/>
+
   </div>
 </template>
 
 <script>
 import { GetMovies } from '@/services/Movies';
 import { UpdateStatusMovie } from '@/services/Movies';
-import { PutMovie } from '@/services/Movies';
 import Loading from 'vue-loading-overlay';
 // Import stylesheet
 import 'vue-loading-overlay/dist/vue-loading.css';
@@ -83,6 +88,12 @@ import UpdateMovie from './UpdateMovie.vue';
 import Modal from "@/components/Modal.vue";
 
 export default {
+  props: {
+    moviesFiltered: {
+      required: false,
+      type: Array,
+    },
+  },
 	components: {
     Modal,
 		Loading,
@@ -99,12 +110,19 @@ export default {
 	mounted() {
 		this.getMovies();
 	},
+  watch: {
+    moviesFiltered(newMoviesFiltered) {
+      this.movies = newMoviesFiltered // Actualiza la lista de películas
+    },
+  },
 	methods: {
 		async getMovies() {
+      console.log(this.moviesFiltered.length);
 			try {
 				this.isLoading = true;
 				const data = await GetMovies();
 				this.movies = data;
+        console.log(this.movies)
 				this.isLoading = false;
 			} catch (e) {
 				console.log(e);

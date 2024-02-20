@@ -62,6 +62,17 @@
               placeholder="director"
           ></b-form-input>
         </b-form-group>
+        <b-form-group
+            id="publicationDate"
+            label="Publication Date"
+            label-for="publicationDate"
+        >
+          <b-form-input
+              id="publicationDate"
+              v-model="form.publicationDate"
+              type="date"
+          ></b-form-input>
+        </b-form-group>
       </form>
     </b-modal>
   </div>
@@ -84,7 +95,8 @@ export default Vue.extend({
         category: {
           id: null,
         },
-        director: ''
+        director: '',
+        publicationDate: ''
       },
       categories: [],
       options: [],
@@ -130,6 +142,10 @@ export default Vue.extend({
         this.errors.push('Director is required')
       }
 
+      if (!this.form.publicationDate) {
+        this.errors.push('Publication Date is required')
+      }
+
     },
     resetModal() {
       this.form.name = ''
@@ -138,6 +154,7 @@ export default Vue.extend({
         id: null
       }
       this.form.director = ''
+      this.form.publicationDate = ''
       this.errors = []
     },
     handleOk(bvModalEvent) {
