@@ -70,7 +70,7 @@ export const GetMoviesByFilter = async (meta, data) => {
 	const dataform = {
 		name : data,
 		director : data,
-		publicationDate : data,
+		//publicationDate : data,
 	}
 	console.log(dataform)
 	try {
