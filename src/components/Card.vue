@@ -4,8 +4,13 @@
       <loading :active.sync="isLoading" :is-full-page="fullPage">
       </loading>
     </div>
-		<b-row cols="4">
-			<b-col v-for="movie in movies" :key="movie.id">
+		<b-row cols="4" v-for="(row, rowIndex) in matrix" :key="'row-'+rowIndex">
+			<b-col v-for="(movie, colIndex) in row" :key="'col-'+colIndex" :class="{'drag-item':movie!==null}"
+        @dragstart="handleDragStart($event, rowIndex, colIndex)"
+        @dragover.prevent
+        @drop="handleDrop(rowIndex, colIndex)"
+        draggable="true"
+      >
 
 				<b-card
 					img-src="https://picsum.photos/600/300/?image=25"
@@ -105,6 +110,8 @@ export default {
 			isLoading: false,
 			fullPage: true,
 			movieSelected: {},
+      matrix: [],
+      draggedItem: null,
 		};
 	},
 	mounted() {
@@ -117,12 +124,11 @@ export default {
   },
 	methods: {
 		async getMovies() {
-      console.log(this.moviesFiltered.length);
 			try {
 				this.isLoading = true;
 				const data = await GetMovies();
 				this.movies = data;
-        console.log(this.movies)
+        this.buildMatrix();
 				this.isLoading = false;
 			} catch (e) {
 				console.log(e);
@@ -150,6 +156,51 @@ export default {
 		async putMovie(id) {
 			console.log(id);
 		},
+    //metodo que construa la matrix con las peliculas obtenidas
+    buildMatrix() {
+      this.matrix = [];
+      let row = [];
+      for (let i = 0; i < this.movies.length; i++) {
+        row.push(this.movies[i]);
+        if (row.length === 3) {
+          this.matrix.push(row);
+          row = [];
+        }
+      }
+      if (row.length > 0) {
+        this.matrix.push(row);
+      }
+    },
+    handleDragStart(event, rowIndex, colIndex) {
+      // Guardamos el elemento que estamos arrastrando, esta se guarda desde el momento
+      // que realizamos el arrastre del objeto
+      this.draggedItem = { rowIndex, colIndex };
+    },
+    handleDrop(rowIndex, colIndex) {
+
+      // Obtenemos el elemento arrastrado
+      const { draggedItem } = this;
+
+      // Verificamos si el elemento está siendo arrastrado dentro de la misma matriz
+      if (
+          draggedItem.rowIndex === rowIndex &&
+          draggedItem.colIndex === colIndex
+      ) {
+        return;
+      }
+
+      // Realizamos el intercambio de elementos
+      const temp = this.matrix[rowIndex][colIndex];
+      this.$set(
+          this.matrix[rowIndex],
+          colIndex,
+          this.matrix[draggedItem.rowIndex][draggedItem.colIndex]
+      );
+      this.$set(this.matrix[draggedItem.rowIndex], draggedItem.colIndex, temp);
+
+      // Reseteamos draggedItem a null después de soltar
+      this.draggedItem = null;
+    },
 	},
 };
 </script>
