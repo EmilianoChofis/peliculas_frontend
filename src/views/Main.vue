@@ -7,10 +7,10 @@ import Card from '@/components/Card.vue';
     <b-card class="mt-3">
       <b-row class="mb-3">
         <b-col cols="10">
-          <h2 class="text-center">Peliculas</h2>
+          <h2 v-show="showElement" class="text-center">Peliculas</h2>
         </b-col>
       </b-row>
-        <b-row>
+        <b-row v-show="showElement">
           <b-col>
             <b-nav-form @submit.prevent="getFiltered">
               <b-alert variant="danger" dismissible :show="errors.length > 0">
@@ -90,13 +90,28 @@ export default {
       ],
       startDate: '',
       endDate: '',
-      errors:[]
+      errors:[],
+      showElement: true,
+      lastScrollPosition: 0
     }
   },
   mounted() {
     //this.getFiltered();
+    window.addEventListener("scroll", this.onScroll);
+
+  },
+  beforeDestroy() {
+    window.removeEventListener("scroll", this.onScroll);
   },
   methods: {
+    onScroll() {
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      if (Math.abs(currentScrollPosition - this.lastScrollPosition) < 60) {
+        return;
+      }
+      this.showElement = currentScrollPosition < this.lastScrollPosition;
+      this.lastScrollPosition = currentScrollPosition;
+    },
     async getFiltered() {
       console.log(this.errors)
       this.errors = []
